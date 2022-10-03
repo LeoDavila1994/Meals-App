@@ -13,7 +13,10 @@ const restaurantExist = catchAsync (async (req, res, next) => {
         });
 
         if (!restaurant) {
-            return next(new AppError(`The restaurant whit ID: ${id} doesent exist in our server or the status is inactive`), 404)
+            return res.status(404).json({
+                status: 'error',
+                message: `The restaurant whit ID: ${id} doesent exist in our server or the status is inactive`,
+            });
         }
 
         req.restaurant = restaurant;
@@ -26,10 +29,7 @@ const userIsAdmin = (req, res, next) => {
         const { sessionUser } = req;
 
         if (sessionUser.role !== 'admin') {
-            res.status(404).json({
-                status: 'error',
-                message: 'Just the admin user can update the restaurants',
-            });
+            return next(new AppError('Just the admin user can update the restaurants', 404))
         }
 
         next();
@@ -60,10 +60,7 @@ const reviewOwner = (req, res, next) => {
         const { sessionUser, review } = req;
 
         if (sessionUser.id !== review.userId) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'You are not the review owner',
-            });
+            return next(new AppError('You are not the review owner', 404))
         }
 
         next();

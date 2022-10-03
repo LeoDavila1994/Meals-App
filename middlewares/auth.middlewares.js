@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
 
 const { catchAsync } = require("../utils/catchAsync.util");
+const { AppError } = require("../utils/appError.util");
 
 const protectSession = catchAsync (async (req, res, next) => {
 
@@ -47,10 +48,7 @@ const protectUsersAccount = (req, res, next) => {
     const { sessionUser, user } = req;
 
     if (sessionUser.id !== user.id) {
-        return res.status(403).json({
-            status: 'error',
-            message: 'You are not the owner of this account',
-        });
+        return next(new AppError('You are not the owner of this account', 403))
     }
 
     next();

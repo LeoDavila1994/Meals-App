@@ -1,4 +1,5 @@
 const { Users } = require('../models/users.models');
+
 const { catchAsync } = require("../utils/catchAsync.util");
 
 const userExist = catchAsync (async (req, res, next) => {
