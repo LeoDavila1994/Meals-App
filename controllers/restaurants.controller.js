@@ -25,7 +25,7 @@ const getAllRestaurants = catchAsync (async (req, res, next) => {
         });
 
         res.status(200).json({
-            status: 'succes',
+            status: 'success',
             data: {
                 restaurants,
             },
@@ -64,7 +64,7 @@ const deleteRestaurant = (req, res) => {
 
         restaurant.update({ status: 'inactive' });
 
-        res.status(204).json({ status: 'succes' });
+        res.status(204).json({ status: 'success' });
 };
 
 const createReview = catchAsync (async (req, res, next) => {

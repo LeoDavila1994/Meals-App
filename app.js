@@ -12,6 +12,8 @@ const { mealsRoute } = require('./routes/meals.route');
 
 const { ordersRoute } = require('./routes/orders.route');
 
+const { globalErrorHandler } = require("./controllers/error.controller");
+
 app.use('/api/v1/users', usersRoute);
 
 app.use('/api/v1/restaurants', restaurantsRoute);
@@ -20,18 +22,7 @@ app.use('/api/v1/meals', mealsRoute);
 
 app.use('/api/v1/orders', ordersRoute);
 
-app.use((error, req, res, next) => {
-
-    const statusCode = error.statusCode || 500
-    const status = error.status || "fail"
-
-    res.status(statusCode).json({
-        status,
-        message: error.message,
-        error,
-        stack: error.stack
-    });
-});
+app.use(globalErrorHandler);
 
 app.all('*', (req, res) => {
     const { method, url } = req;

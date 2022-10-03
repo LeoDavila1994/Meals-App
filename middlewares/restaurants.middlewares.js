@@ -13,10 +13,7 @@ const restaurantExist = catchAsync (async (req, res, next) => {
         });
 
         if (!restaurant) {
-            return res.status(404).json({
-                status: 'error',
-                message: `The restaurant whit ID: ${id} doesent exist in our server or the status is inactive`,
-            });
+            return next(new AppError(`The restaurant whit ID: ${id} doesent exist in our server or the status is inactive`, 404))
         }
 
         req.restaurant = restaurant;
@@ -44,10 +41,7 @@ const reviewExist = catchAsync (async (req, res, next) => {
         });
 
         if (!review) {
-            res.status(404).json({
-                status: 'error',
-                message: `Review with ID: ${id} doesent exist or your status is inactive`,
-            });
+            return next(new AppError(`Review with ID: ${id} doesent exist or your status is inactive`, 404))
         }
 
         req.review = review;

@@ -20,10 +20,7 @@ const protectSession = catchAsync (async (req, res, next) => {
         }
 
         if (!token) {
-            return res.status(403).json({
-                status: 'error',
-                message: 'Invalid session',
-            });
+            return next(new AppError('Invalid session', 403))
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -33,10 +30,7 @@ const protectSession = catchAsync (async (req, res, next) => {
         });
 
         if (!user) {
-            return res.status(403).json({
-                status: 'error',
-                message: 'The owner of the session is no longer active',
-            });
+            return next('The owner of the session is no longer active', 403);
         }
 
         req.sessionUser = user;

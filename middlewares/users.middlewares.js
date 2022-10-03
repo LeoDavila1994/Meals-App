@@ -1,6 +1,6 @@
 const { Users } = require('../models/users.models');
-
 const { catchAsync } = require("../utils/catchAsync.util");
+const { AppError } = require("../utils/appError.util");
 
 const userExist = catchAsync (async (req, res, next) => {
 
@@ -12,10 +12,7 @@ const userExist = catchAsync (async (req, res, next) => {
         });
 
         if (!user) {
-            return res.status(400).json({
-                status: 'error',
-                message: `User with ID:${id} doesent exist or your status are inactive`,
-            });
+            return next(new AppError(`User with ID:${id} doesent exist or your status are inactive`, 404))
         }
 
         req.user = user;

@@ -1,7 +1,7 @@
 const { Meals } = require('../models/meals.models');
 const { Restaurants } = require('../models/restaurants.models');
-
 const { catchAsync } = require("../utils/catchAsync.util");
+const { AppError } = require("../utils/appError.util");
 
 const mealExist = catchAsync (async (req, res, next) => {
 
@@ -13,10 +13,7 @@ const mealExist = catchAsync (async (req, res, next) => {
         });
 
         if (!meal) {
-            res.status(404).json({
-                status: 'error',
-                message: `The meal with ID: ${id} doesent, exist or your status is inactive`,
-            });
+            return next(new AppError(`The meal with ID: ${id} doesent, exist or your status is inactive`, 404));
         }
 
         req.meal = meal;
