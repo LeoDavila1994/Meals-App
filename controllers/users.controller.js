@@ -2,6 +2,7 @@ const { Users } = require('../models/users.models');
 const { Orders } = require('../models/orders.models');
 const { Meals } = require('../models/meals.models');
 const { Restaurants } = require('../models/restaurants.models');
+const { AppError } = require("../utils/appError.util");
 
 const bcrypt = require('bcryptjs');
 
@@ -11,8 +12,10 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: './config.env' });
 
-const createUser = async (req, res) => {
-    try {
+const { catchAsync } = require("../utils/catchAsync.util");
+
+const createUser = catchAsync (async (req, res, next) => {
+
         const { name, email, password } = req.body;
 
         const salt = await bcrypt.genSalt(12);
@@ -31,13 +34,10 @@ const createUser = async (req, res) => {
             status: 'success',
             data: { newUser },
         });
-    } catch (error) {
-        console.log(error);
-    }
-};
+});
 
-const login = async (req, res) => {
-    try {
+const login = catchAsync (async (req, res, next) => {
+
         const { email, password } = req.body;
 
         const user = await Users.findOne({
@@ -45,10 +45,7 @@ const login = async (req, res) => {
         });
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'Invalid credentials',
-            });
+            return next(new AppError("wrong credentials", 400))
         }
 
         user.password = undefined;
@@ -61,13 +58,10 @@ const login = async (req, res) => {
             status: 'success',
             data: { user, token },
         });
-    } catch (error) {
-        console.log(error);
-    }
-};
+});
 
-const updateUser = async (req, res) => {
-    try {
+const updateUser = catchAsync (async (req, res, next) => {
+
         const { name, email } = req.body;
         const { user } = req;
 
@@ -77,25 +71,19 @@ const updateUser = async (req, res) => {
             status: 'success',
             data: { user },
         });
-    } catch (error) {
-        console.log(error);
-    }
-};
+});
 
-const deleteUser = async (req, res) => {
-    try {
+const deleteUser = catchAsync (async (req, res, next) => {
+
         const { user } = req;
 
         await user.update({ status: 'inactive' });
 
         res.status(204).json({ status: 'success' });
-    } catch (error) {
-        console.log(error);
-    }
-};
+});
 
-const getAllUserOrders = async (req, res) => {
-    try {
+const getAllUserOrders = catchAsync (async (req, res, next) => {
+
         const { sessionUser } = req;
 
         const orders = await Orders.findAll({
@@ -117,13 +105,10 @@ const getAllUserOrders = async (req, res) => {
                 orders,
             },
         });
-    } catch (error) {
-        console.log(error);
-    }
-};
+});
 
-const getOrderDetail = async (req, res) => {
-    try {
+const getOrderDetail = catchAsync (async (req, res, next) => {
+
         const { sessionUser } = req;
         const { id } = req.params;
 
@@ -146,10 +131,7 @@ const getOrderDetail = async (req, res) => {
                 order,
             },
         });
-    } catch (error) {
-        console.log(error);
-    }
-};
+});
 
 module.exports = {
     createUser,

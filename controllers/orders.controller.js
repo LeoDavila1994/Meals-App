@@ -1,9 +1,12 @@
 const { Orders } = require('../models/orders.models');
 const { Restaurants } = require('../models/restaurants.models');
 const { Meals } = require('../models/meals.models');
+const { AppError } = require("../utils/appError.util");
 
-const createOrder = async (req, res) => {
-    try {
+const { catchAsync } = require("../utils/catchAsync.util");
+
+const createOrder = catchAsync (async (req, res, next) => {
+
         const { meal, sessionUser } = req;
 
         const activeOrder = await Orders.findAll({
@@ -11,10 +14,7 @@ const createOrder = async (req, res) => {
         });
 
         if (activeOrder[0]) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'The user has an order in process',
-            });
+            return next(new AppError('The user has an order in process', 400))
         }
 
         const { quantity } = req.body;
@@ -34,13 +34,10 @@ const createOrder = async (req, res) => {
                 order,
             },
         });
-    } catch (error) {
-        console.log();
-    }
-};
+});
 
-const getAllOrders = async (req, res) => {
-    try {
+const getAllOrders = catchAsync (async (req, res, next) => {
+
         const orders = await Orders.findAll({
             include: { model: Meals, include: Restaurants },
         });
@@ -51,13 +48,10 @@ const getAllOrders = async (req, res) => {
                 orders,
             },
         });
-    } catch (error) {
-        console.log(error);
-    }
-};
+});
 
 const completedOrder = (req, res) => {
-    try {
+
         const { order } = req;
 
         order.update({ status: 'completed' });
@@ -68,21 +62,15 @@ const completedOrder = (req, res) => {
                 order,
             },
         });
-    } catch (error) {
-        console.log();
-    }
 };
 
 const cancellOrder = (req, res) => {
-    try {
+
         const { order } = req;
 
         order.update({ status: 'cancelled' });
 
         res.status(204).json({ status: 'success' });
-    } catch (error) {
-        console.log();
-    }
 };
 
 module.exports = { createOrder, getAllOrders, completedOrder, cancellOrder };
